@@ -1,0 +1,80 @@
+<?php
+
+namespace ApiBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Exclude;
+
+/**
+ * JobHistory
+ *
+ * @ORM\Table(name="job_history", indexes={@ORM\Index(name="JHIST_DEPARTMENT_IX", columns={"DEPARTMENT_ID"}), @ORM\Index(name="JHIST_EMPLOYEE_IX", columns={"EMPLOYEE_ID"}), @ORM\Index(name="JHIST_JOB_IX", columns={"JOB_ID"})})
+ * @ORM\Entity
+ */
+class JobHistory
+{
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="EMPLOYEE_ID", type="decimal")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="NONE")
+     */
+    private $employeeId;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="START_DATE", type="date")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="NONE")
+     */
+    private $startDate;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="END_DATE", type="date", nullable=false)
+     */
+    private $endDate;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="JOB_ID", type="string", length=10, nullable=false)
+     */
+    private $jobId;
+
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Jobs", inversedBy="jobHistories")
+     * @ORM\JoinColumn(name="JOB_ID", referencedColumnName="JOB_ID")
+     * @Exclude
+     */
+    protected $job;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="DEPARTMENT_ID", type="decimal", precision=4, scale=0, nullable=true)
+     */
+    private $departmentId;
+
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     * @Exclude*
+     * @ORM\OneToMany(targetEntity="ApiBundle\Entity\Employees", mappedBy="jobHistory")
+     */
+    private $employees;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->employees = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+
+}
