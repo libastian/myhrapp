@@ -18,6 +18,7 @@ class AppKernel extends Kernel
             new ApiBundle\ApiBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new FOS\RestBundle\FOSRestBundle(),
+            new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
 
         );
 
