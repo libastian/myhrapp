@@ -29,11 +29,9 @@ class CountriesController extends Controller
         $repo =  $this->getDoctrine()->getManager()->getRepository('ApiBundle:Departments');
         $query = $repo->createQueryBuilder('d')
             ->setParameter('contryId', $id)
-            ->innerJoin('d.location','l')
-            ->where("l.locationId = d.locationId")
-            ->innerJoin('d.employees','e')
-            ->andWhere("e.departmentId = d.departmentId")
-            ->andWhere("l.countryId = :contryId")
+            ->Join('d.location','l')
+            ->Join('d.employees','e')
+            ->Where("l.countryId = :contryId")
             ->orderBy('e.salary', 'desc')
             ->getQuery()->getResult();
 
