@@ -65,7 +65,6 @@ class Employees
 
     /**
      * @var string
-     * @Exclude
      * @ORM\Column(name="SALARY", type="decimal", precision=8, scale=2, nullable=true)
      */
     private $salary;

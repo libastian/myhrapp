@@ -2,14 +2,11 @@
 
 namespace ApiBundle\Controller;
 
-use ApiBundle\Entity\DepartmentsRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use FOS\RestBundle\Controller\Annotations\Get;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Pagerfanta\Pagerfanta;
-use Pagerfanta\Adapter\DoctrineORMAdapter;
-use Pagerfanta\Exception\NotValidCurrentPageException;
+
 
 /**
  * Class CountriesController
@@ -25,34 +22,22 @@ class CountriesController extends Controller
     public function getContriesAction(Request $request, $id)
     {
 
-        /* @var $repo DepartmentsRepository*/
         $repo =  $this->getDoctrine()->getManager()->getRepository('ApiBundle:Departments');
         $query = $repo->createQueryBuilder('d')
+            ->select('d','e','l')
+            ->addSelect('(SELECT avg(temp.salary) as tema FROM ApiBundle\Entity\Employees temp WHERE temp.departmentId = d.departmentId) as avgSalary')
             ->setParameter('contryId', $id)
             ->Join('d.location','l')
             ->Join('d.employees','e')
             ->Where("l.countryId = :contryId")
-            ->orderBy('e.salary', 'desc')
-            ->getQuery()->getResult();
+            ->groupBy('e.employeeId')
+            ->orderBy('avgSalary','DESC')
+            ->getQuery();
 
-        //Paginamos los resultados;
-        $pagerfanta = new Pagerfanta(new DoctrineORMAdapter($query));
 
-        // Establecemos los valores del paginador
-        $defaultMax = '10';
-        if ($count = $request->get('limit')) {
-            $pagerfanta->setMaxPerPage($count);
-        } else {
-            $pagerfanta->setMaxPerPage($defaultMax);
-        }
-        if ($page = $request->get('page')) {
-            try {
-                $pagerfanta->setCurrentPage($page);
-            } catch (NotValidCurrentPageException $e) {
-                throw new NotFoundHttpException();
-            }
-        }
-
-        return $pagerfanta;
+        $paginator  = $this->get('knp_paginator');
+        $pagination = $paginator->paginate($query, $request->query->getInt('page', 1));
+       
+        return $pagination;
     }
 }
